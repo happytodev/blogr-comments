@@ -8,7 +8,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Happytodev\BlogrComments\Filament\Resources\CommentResource;
@@ -38,14 +37,15 @@ class ListComments extends ListRecords
                     ->label(__('blogr-comments::messages.post'))
                     ->searchable()
                     ->sortable(),
-                BadgeColumn::make('status')
+                TextColumn::make('status')
                     ->label(__('blogr-comments::messages.filter_status'))
+                    ->badge()
                     ->colors([
                         'warning' => 'pending',
                         'success' => 'approved',
                         'danger' => 'rejected',
-                        'gray' => 'spam',
                     ])
+                    ->icon('heroicon-o-shield-exclamation')
                     ->sortable(),
                 TextColumn::make('vote_score')
                     ->label('Votes')
