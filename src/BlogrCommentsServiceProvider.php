@@ -2,11 +2,15 @@
 
 namespace Happytodev\BlogrComments;
 
+use Filament\Facades\Filament;
 use Filament\PanelRegistry;
+use Filament\Support\Facades\FilamentComponent;
+use Livewire\Livewire;
+use Livewire\Mechanisms\ComponentRegistry;
 use Happytodev\Blogr\Services\ExtensionRegistry;
+use Happytodev\BlogrComments\Filament\Pages\CommentSettings;
 use Happytodev\BlogrComments\Filament\Widgets\PendingCommentsWidget;
 use Happytodev\BlogrComments\Http\Middleware\ThrottleComments;
-use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View;
@@ -46,6 +50,7 @@ class BlogrCommentsServiceProvider extends ServiceProvider
 
         $this->registerExtensions();
         $this->registerBladeStacks();
+        $this->registerFilamentPages();
         $this->registerMiddleware();
         $this->registerCommands();
     }
@@ -85,6 +90,34 @@ class BlogrCommentsServiceProvider extends ServiceProvider
 
             $view->getFactory()->startPush('comments', $commentsView);
         });
+    }
+
+    protected function registerFilamentPages(): void
+    {
+        if (! $this->isExtensionEnabled()) {
+            return;
+        }
+
+        if (! class_exists(Filament::class)) {
+            return;
+        }
+
+        try {
+            $panel = Filament::getPanel('admin');
+        } catch (\Exception $e) {
+            return;
+        }
+
+        if (! $panel) {
+            return;
+        }
+
+        $panel->pages([CommentSettings::class]);
+
+        Livewire::component(
+            app(ComponentRegistry::class)->getName(CommentSettings::class),
+            CommentSettings::class,
+        );
     }
 
     protected function registerMiddleware(): void

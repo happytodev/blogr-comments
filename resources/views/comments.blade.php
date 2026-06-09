@@ -53,7 +53,7 @@
             <input type="email" x-model="form.author_email" placeholder="{{ __('blogr-comments::messages.your_email') }}" required>
             <textarea x-model="form.content" rows="4" placeholder="{{ __('blogr-comments::messages.write_comment') }}" required></textarea>
             <div x-show="replyTo" class="reply-indicator">
-                {{ __('blogr-comments::messages.reply') }} <strong x-text="replyTo.author_name"></strong>
+                {{ __('blogr-comments::messages.reply') }} <strong x-text="replyTo ? replyTo.author_name : ''"></strong>
                 <button @click="cancelReply" type="button">({{ __('blogr-comments::messages.cancel_reply') }})</button>
             </div>
             <div x-show="error" class="error" x-text="error"></div>
