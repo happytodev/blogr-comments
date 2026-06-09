@@ -147,6 +147,9 @@ function comments() {
             this.error = '';
             this.statusMessage = '';
 
+            const csrfMeta = document.querySelector('meta[name=csrf-token]');
+            console.log('🔑 CSRF token found:', !!csrfMeta, csrfMeta?.content?.substring(0, 10) + '...');
+
             let url = '/comments/' + this.postSlug;
             let body = new FormData();
             body.append('author_name', this.form.author_name);
@@ -162,7 +165,16 @@ function comments() {
                 body,
                 headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '' }
             })
-                .then(r => r.json().then(d => ({ status: r.status, body: d })))
+                .then(r => {
+                    console.log('📬 Comment POST to:', url);
+                    console.log('📊 Response status:', r.status);
+                    return r.text().then(text => {
+                        console.log('📄 Response text:', text.substring(0, 500));
+                        let json;
+                        try { json = JSON.parse(text); } catch(e) { json = { raw: text }; }
+                        return { status: r.status, body: json, raw: text };
+                    });
+                })
                 .then(({ status, body }) => {
                     if (body.comment_status === 'submitted') {
                         this.form = { author_name: '', author_email: '', content: '' };
@@ -174,12 +186,17 @@ function comments() {
                         this.statusMessage = '{{ __('blogr-comments::messages.comment_spam') }}';
                         this.statusError = true;
                     } else if (body.error) {
+                        console.error('❌ Server error:', body.error);
                         this.error = body.error;
                     } else {
-                        this.error = '{{ __('blogr-comments::messages.an_error_occurred') }}';
+                        console.error('❌ Unexpected response:', status, body);
+                        this.error = '{{ __('blogr-comments::messages.an_error_occurred') }} (status: ' + status + ')';
                     }
                 })
-                .catch(() => { this.error = '{{ __('blogr-comments::messages.an_error_occurred') }}'; });
+                .catch(err => {
+                    console.error('❌ Network/fetch error:', err);
+                    this.error = '{{ __('blogr-comments::messages.an_error_occurred') }}';
+                });
         },
 
         vote(commentId, type) {
