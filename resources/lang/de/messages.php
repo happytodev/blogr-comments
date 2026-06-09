@@ -29,6 +29,12 @@ return [
     'email_required' => 'E-Mail wird für Benachrichtigungen benötigt.',
     'load_more' => 'Weitere Kommentare laden',
     'thread_closed' => 'Die Kommentare sind für diesen Beitrag geschlossen.',
+    'an_error_occurred' => 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.',
+    'just_now' => 'gerade eben',
+    'max_depth_reached' => 'Maximale Antworttiefe erreicht.',
+    'captcha_required' => 'Bitte führen Sie die Sicherheitsüberprüfung durch.',
+    'captcha_failed' => 'Sicherheitsüberprüfung fehlgeschlagen. Bitte versuchen Sie es erneut.',
+    'rate_limit_exceeded' => 'Zu viele Anfragen. Bitte warten Sie :minutes Minuten.',
 
     'pending' => 'Ausstehend',
     'approved' => 'Genehmigt',

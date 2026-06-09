@@ -5,6 +5,7 @@ namespace Happytodev\BlogrComments\Http\Controllers;
 use Happytodev\BlogrComments\Models\Comment;
 use Happytodev\BlogrComments\Services\CommentService;
 use Happytodev\BlogrComments\Services\SpamService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -17,15 +18,22 @@ class CommentController extends Controller
         protected SpamService $spamService,
     ) {}
 
-    public function index(string $postSlug, Request $request): View
+    public function index(string $postSlug, Request $request): View|JsonResponse
     {
         $sort = $request->get('sort', 'newest');
         $comments = $this->commentService->getComments($postSlug, $sort);
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'comments' => $comments,
+                'total' => $comments->count(),
+            ]);
+        }
+
         return view('blogr-comments::comments', compact('comments', 'postSlug', 'sort'));
     }
 
-    public function store(string $postSlug, Request $request): RedirectResponse
+    public function store(string $postSlug, Request $request): JsonResponse
     {
         $validated = $request->validate([
             'author_name' => 'required|string|max:100',
@@ -36,16 +44,16 @@ class CommentController extends Controller
 
         if (config('blogr-comments.spam.captcha.provider') !== 'none') {
             if (empty($validated['captcha_token'])) {
-                return back()->withErrors(['captcha' => __('blogr-comments::messages.captcha_required')]);
+                return response()->json(['error' => __('blogr-comments::messages.captcha_required')], 422);
             }
 
             if (! $this->spamService->verifyCaptcha($validated['captcha_token'])) {
-                return back()->withErrors(['captcha' => __('blogr-comments::messages.captcha_failed')]);
+                return response()->json(['error' => __('blogr-comments::messages.captcha_failed')], 422);
             }
         }
 
         if ($this->spamService->isSpam($validated['content'], $validated['author_email'], $request->ip())) {
-            return back()->with('comment_status', 'spam');
+            return response()->json(['comment_status' => 'spam']);
         }
 
         $this->commentService->createComment([
@@ -56,10 +64,10 @@ class CommentController extends Controller
             'content' => $validated['content'],
         ], $request->ip(), $request->userAgent());
 
-        return back()->with('comment_status', 'submitted');
+        return response()->json(['comment_status' => 'submitted']);
     }
 
-    public function reply(Comment $comment, Request $request): RedirectResponse
+    public function reply(Comment $comment, Request $request): JsonResponse
     {
         $validated = $request->validate([
             'author_name' => 'required|string|max:100',
@@ -70,11 +78,11 @@ class CommentController extends Controller
         $depth = $this->getDepth($comment);
 
         if ($depth >= config('blogr-comments.threading.max_depth', 3)) {
-            return back()->withErrors(['content' => __('blogr-comments::messages.max_depth_reached')]);
+            return response()->json(['error' => __('blogr-comments::messages.max_depth_reached')], 422);
         }
 
         if ($this->spamService->isSpam($validated['content'], $validated['author_email'], $request->ip())) {
-            return back()->with('comment_status', 'spam');
+            return response()->json(['comment_status' => 'spam']);
         }
 
         $this->commentService->createReply($comment, [
@@ -83,10 +91,10 @@ class CommentController extends Controller
             'content' => $validated['content'],
         ], $request->ip(), $request->userAgent());
 
-        return back()->with('comment_status', 'submitted');
+        return response()->json(['comment_status' => 'submitted']);
     }
 
-    public function vote(Comment $comment, Request $request): RedirectResponse
+    public function vote(Comment $comment, Request $request): JsonResponse
     {
         $validated = $request->validate([
             'vote' => 'required|in:up,down',
@@ -94,9 +102,9 @@ class CommentController extends Controller
 
         $voteType = $validated['vote'] === 'up' ? 1 : -1;
 
-        $this->commentService->vote($comment, $voteType, $request->ip(), $request->userAgent());
+        $score = $this->commentService->vote($comment, $voteType, $request->ip(), $request->userAgent());
 
-        return back();
+        return response()->json(['vote_score' => $score]);
     }
 
     protected function getDepth(Comment $comment, int $depth = 0): int

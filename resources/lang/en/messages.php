@@ -30,6 +30,12 @@ return [
     'gravatar' => 'Gravatar',
     'load_more' => 'Load more comments',
     'thread_closed' => 'Comments are closed for this post.',
+    'an_error_occurred' => 'An error occurred. Please try again.',
+    'just_now' => 'just now',
+    'max_depth_reached' => 'Maximum reply depth reached.',
+    'captcha_required' => 'Please complete the security check.',
+    'captcha_failed' => 'Security check failed. Please try again.',
+    'rate_limit_exceeded' => 'Too many requests. Please wait :minutes minutes.',
 
     // Moderation
     'pending' => 'Pending',

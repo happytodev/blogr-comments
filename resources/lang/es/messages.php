@@ -29,6 +29,12 @@ return [
     'email_required' => 'El correo electrónico es necesario para las notificaciones.',
     'load_more' => 'Cargar más comentarios',
     'thread_closed' => 'Los comentarios están cerrados para este artículo.',
+    'an_error_occurred' => 'Ocurrió un error. Por favor, inténtelo de nuevo.',
+    'just_now' => 'ahora mismo',
+    'max_depth_reached' => 'Se alcanzó la profundidad máxima de respuesta.',
+    'captcha_required' => 'Complete la verificación de seguridad.',
+    'captcha_failed' => 'La verificación de seguridad falló. Inténtelo de nuevo.',
+    'rate_limit_exceeded' => 'Demasiadas solicitudes. Espere :minutes minutos.',
 
     'pending' => 'Pendiente',
     'approved' => 'Aprobado',

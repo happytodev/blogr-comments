@@ -30,6 +30,12 @@ return [
     'gravatar' => 'Gravatar',
     'load_more' => 'Charger plus de commentaires',
     'thread_closed' => 'Les commentaires sont fermés pour cet article.',
+    'an_error_occurred' => 'Une erreur est survenue. Veuillez réessayer.',
+    'just_now' => 'à l\'instant',
+    'max_depth_reached' => 'Profondeur de réponse maximale atteinte.',
+    'captcha_required' => 'Veuillez compléter le contrôle de sécurité.',
+    'captcha_failed' => 'Le contrôle de sécurité a échoué. Veuillez réessayer.',
+    'rate_limit_exceeded' => 'Trop de requêtes. Veuillez patienter :minutes minutes.',
 
     'pending' => 'En attente',
     'approved' => 'Approuvé',

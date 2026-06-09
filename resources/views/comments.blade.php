@@ -15,45 +15,51 @@
         .blogr-comment-actions { margin-top: 0.5rem; display: flex; gap: 0.75rem; align-items: center; font-size: 0.875rem; }
         .blogr-comment-votes { display: flex; align-items: center; gap: 0.25rem; }
         .blogr-vote-btn { background: none; border: none; cursor: pointer; padding: 0.25rem; color: #9ca3af; line-height: 1; }
-        .blogr-vote-btn:hover { color: #4f46e5; }
-        .blogr-vote-btn.voted { color: #4f46e5; }
+        .blogr-vote-btn:hover { color: var(--color-primary, #4f46e5); }
+        .blogr-vote-btn.voted { color: var(--color-primary, #4f46e5); }
         .blogr-vote-score { font-weight: 600; font-size: 0.875rem; min-width: 1.5rem; text-align: center; color: #374151; }
         .dark .blogr-vote-score { color: #d1d5db; }
-        .blogr-comment-form { margin-bottom: 1.5rem; }
-        .blogr-comment-form input, .blogr-comment-form textarea { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; margin-bottom: 0.5rem; }
+        .blogr-comment-form input, .blogr-comment-form textarea {
+            width: 100%; padding: 0.625rem; border: 1px solid #d1d5db; border-radius: 0.375rem; margin-bottom: 0.5rem; font-size: 0.9375rem; box-sizing: border-box;
+        }
         .dark .blogr-comment-form input, .dark .blogr-comment-form textarea { background: #374151; border-color: #4b5563; color: #e5e7eb; }
-        .blogr-comment-form .error { color: #dc2626; font-size: 0.875rem; }
+        .blogr-comment-form .error { color: #dc2626; font-size: 0.875rem; margin-bottom: 0.5rem; }
+        .blogr-comment-form .btn-submit {
+            display: inline-block; padding: 0.625rem 1.25rem; background: var(--color-primary, #3b82f6); color: #fff;
+            border: none; border-radius: 0.5rem; font-size: 0.9375rem; font-weight: 500; cursor: pointer;
+        }
+        .blogr-comment-form .btn-submit:hover { opacity: 0.9; }
         .blogr-sort-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.875rem; }
         .blogr-sort-btn { background: none; border: none; cursor: pointer; padding: 0.25rem 0.5rem; border-radius: 0.25rem; color: #6b7280; }
         .blogr-sort-btn.active { background: #e0e7ff; color: #4338ca; font-weight: 500; }
         .dark .blogr-sort-btn.active { background: #312e81; color: #a5b4fc; }
-        .blogr-load-more { text-align: center; margin-top: 1rem; }
-        .blogr-avatar { width: 32px; height: 32px; border-radius: 50%; background: #e5e7eb; flex-shrink: 0; }
         .blogr-comment-header { display: flex; align-items: center; gap: 0.5rem; }
+        .blogr-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; }
+        .blogr-comment-form .reply-indicator { font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; }
+        .blogr-comment-form .reply-indicator button { color: var(--color-primary, #3b82f6); background: none; border: none; cursor: pointer; padding: 0; }
+        .blogr-comment-form .reply-indicator button:hover { text-decoration: underline; }
+        .blogr-comment-status { padding: 0.75rem; border-radius: 0.375rem; margin-bottom: 1rem; font-size: 0.875rem; }
+        .blogr-comment-status.success { background: #d1fae5; color: #065f46; }
+        .blogr-comment-status.error { background: #fee2e2; color: #991b1b; }
     </style>
 
     <h3 class="text-xl font-bold mb-6">{{ __('blogr-comments::messages.comments') }} (<span x-text="totalComments"></span>)</h3>
 
-    <template x-if="!threadClosed">
-        <div class="blogr-comment-form">
-            <form @submit.prevent="submitComment">
-                <input type="text" x-model="form.author_name" placeholder="{{ __('blogr-comments::messages.your_name') }}" required>
-                <input type="email" x-model="form.author_email" placeholder="{{ __('blogr-comments::messages.your_email') }}" required>
-                <textarea x-model="form.content" rows="3" placeholder="{{ __('blogr-comments::messages.write_comment') }}" required></textarea>
-                <template x-if="replyTo">
-                    <div class="text-sm text-gray-500 mb-2">
-                        {{ __('blogr-comments::messages.reply') }}
-                        <strong x-text="replyTo.author_name"></strong>
-                        <button @click="cancelReply" class="text-primary-600 ml-2">{{ __('blogr-comments::messages.cancel_reply') }}</button>
-                    </div>
-                </template>
-                <div x-show="error" class="error" x-text="error"></div>
-                <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-500">
-                    {{ __('blogr-comments::messages.submit') }}
-                </button>
-            </form>
-        </div>
-    </template>
+    <div x-show="statusMessage" x-text="statusMessage" :class="'blogr-comment-status ' + (statusError ? 'error' : 'success')" x-cloak></div>
+
+    <div class="blogr-comment-form">
+        <form @submit.prevent="submitComment">
+            <input type="text" x-model="form.author_name" placeholder="{{ __('blogr-comments::messages.your_name') }}" required>
+            <input type="email" x-model="form.author_email" placeholder="{{ __('blogr-comments::messages.your_email') }}" required>
+            <textarea x-model="form.content" rows="4" placeholder="{{ __('blogr-comments::messages.write_comment') }}" required></textarea>
+            <div x-show="replyTo" class="reply-indicator">
+                {{ __('blogr-comments::messages.reply') }} <strong x-text="replyTo.author_name"></strong>
+                <button @click="cancelReply" type="button">({{ __('blogr-comments::messages.cancel_reply') }})</button>
+            </div>
+            <div x-show="error" class="error" x-text="error"></div>
+            <button type="submit" class="btn-submit">{{ __('blogr-comments::messages.submit') }}</button>
+        </form>
+    </div>
 
     <div class="blogr-sort-bar">
         <button @click="sort = 'newest'; loadComments()" :class="{'active': sort === 'newest'}" class="blogr-sort-btn">{{ __('blogr-comments::messages.sort_newest') }}</button>
@@ -78,11 +84,11 @@
                 <div class="blogr-comment-content" x-html="comment.content_html"></div>
                 <div class="blogr-comment-actions">
                     <div class="blogr-comment-votes">
-                        <button @click="vote(comment.id, 'up')" :class="{'voted': comment.user_vote === 1}" class="blogr-vote-btn">▲</button>
+                        <button @click="vote(comment.id, 'up')" :class="{'voted': comment.user_vote === 1}" class="blogr-vote-btn">&#9650;</button>
                         <span class="blogr-vote-score" x-text="comment.vote_score"></span>
-                        <button @click="vote(comment.id, 'down')" :class="{'voted': comment.user_vote === -1}" class="blogr-vote-btn">▼</button>
+                        <button @click="vote(comment.id, 'down')" :class="{'voted': comment.user_vote === -1}" class="blogr-vote-btn">&#9660;</button>
                     </div>
-                    <button @click="setReply(comment)" class="text-sm text-primary-600 hover:text-primary-500">
+                    <button @click="setReply(comment)" class="text-sm hover:underline" style="color: var(--color-primary, #3b82f6); background: none; border: none; cursor: pointer;">
                         {{ __('blogr-comments::messages.reply') }}
                     </button>
                 </div>
@@ -90,23 +96,16 @@
             <template x-if="comment.replies && comment.replies.length > 0">
                 <div class="blogr-comment-thread">
                     <template x-for="reply in comment.replies" :key="reply.id">
-                        <template x-if="reply.status === 'approved'">
-                            <div class="blogr-comment" :id="'comment-' + reply.id">
-                                <div class="blogr-comment-header">
-                                    <img :src="'https://www.gravatar.com/avatar/' + md5(reply.author_email) + '?s=32&d=mp'" class="blogr-avatar" alt="">
-                                    <div>
-                                        <span class="blogr-comment-author" x-text="reply.author_name"></span>
-                                        <span class="blogr-comment-time" x-text="timeAgo(reply.created_at)"></span>
-                                    </div>
-                                </div>
-                                <div class="blogr-comment-content" x-html="reply.content_html"></div>
-                                <div class="blogr-comment-actions">
-                                    <button @click="setReply(comment)" class="text-sm text-primary-600 hover:text-primary-500">
-                                        {{ __('blogr-comments::messages.reply') }}
-                                    </button>
+                        <div class="blogr-comment" :id="'comment-' + reply.id">
+                            <div class="blogr-comment-header">
+                                <img :src="'https://www.gravatar.com/avatar/' + md5(reply.author_email) + '?s=32&d=mp'" class="blogr-avatar" alt="">
+                                <div>
+                                    <span class="blogr-comment-author" x-text="reply.author_name"></span>
+                                    <span class="blogr-comment-time" x-text="timeAgo(reply.created_at)"></span>
                                 </div>
                             </div>
-                        </template>
+                            <div class="blogr-comment-content" x-html="reply.content_html"></div>
+                        </div>
                     </template>
                 </div>
             </template>
@@ -122,8 +121,9 @@ function comments() {
         sort: 'newest',
         postSlug: '',
         replyTo: null,
-        threadClosed: false,
         error: '',
+        statusMessage: '',
+        statusError: false,
         form: { author_name: '', author_email: '', content: '' },
 
         init(slug) {
@@ -132,17 +132,21 @@ function comments() {
         },
 
         loadComments() {
-            fetch('/comments/' + this.postSlug + '?sort=' + this.sort)
-                .then(r => r.text())
-                .then(html => {
-                    // Parse HTML response to extract comments
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    // The server renders the partial, we'll use JSON for now
-                });
+            fetch('/comments/' + this.postSlug + '?sort=' + this.sort, {
+                headers: { 'Accept': 'application/json' }
+            })
+                .then(r => r.json())
+                .then(data => {
+                    this.comments = data.comments || [];
+                    this.totalComments = data.total || this.comments.length;
+                })
+                .catch(() => {});
         },
 
         submitComment() {
+            this.error = '';
+            this.statusMessage = '';
+
             let url = '/comments/' + this.postSlug;
             let body = new FormData();
             body.append('author_name', this.form.author_name);
@@ -153,49 +157,78 @@ function comments() {
                 url = '/comments/' + this.replyTo.id + '/reply';
             }
 
-            fetch(url, { method: 'POST', body, headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content } })
-                .then(r => r.json().catch(() => r.text()))
-                .then(data => {
-                    if (data.status === 'submitted' || data.comment_status === 'submitted') {
+            fetch(url, {
+                method: 'POST',
+                body,
+                headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '' }
+            })
+                .then(r => r.json().then(d => ({ status: r.status, body: d })))
+                .then(({ status, body }) => {
+                    if (body.comment_status === 'submitted') {
                         this.form = { author_name: '', author_email: '', content: '' };
                         this.replyTo = null;
+                        this.statusMessage = '{{ __('blogr-comments::messages.comment_pending') }}';
+                        this.statusError = false;
                         this.loadComments();
+                    } else if (body.comment_status === 'spam') {
+                        this.statusMessage = '{{ __('blogr-comments::messages.comment_spam') }}';
+                        this.statusError = true;
+                    } else if (body.error) {
+                        this.error = body.error;
                     } else {
-                        this.error = 'An error occurred.';
+                        this.error = '{{ __('blogr-comments::messages.an_error_occurred') }}';
                     }
                 })
-                .catch(() => { this.error = 'An error occurred.'; });
+                .catch(() => { this.error = '{{ __('blogr-comments::messages.an_error_occurred') }}'; });
         },
 
         vote(commentId, type) {
             fetch('/comments/' + commentId + '/vote', {
                 method: 'POST',
                 body: new URLSearchParams({ vote: type }),
-                headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content, 'Content-Type': 'application/x-www-form-urlencoded' }
-            }).then(() => this.loadComments());
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content || '',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.vote_score !== undefined) {
+                        const comment = this.comments.find(c => c.id === commentId);
+                        if (comment) comment.vote_score = data.vote_score;
+                    }
+                })
+                .catch(() => {});
         },
 
         setReply(comment) {
             this.replyTo = comment;
+            this.form.content = '';
         },
 
         cancelReply() {
             this.replyTo = null;
         },
 
-        timeAgo(date) {
-            const d = new Date(date);
+        timeAgo(dateStr) {
+            const d = new Date(dateStr);
             const now = new Date();
             const diff = Math.floor((now - d) / 1000);
-            if (diff < 60) return 'just now';
-            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
-            if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+            if (diff < 60) return '{{ __('blogr-comments::messages.just_now') }}';
+            if (diff < 3600) return Math.floor(diff / 60) + 'm';
+            if (diff < 86400) return Math.floor(diff / 3600) + 'h';
             return d.toLocaleDateString();
         },
 
         md5(str) {
-            // Simple md5 for gravatar - in production use a proper hash
-            return str.split('').reduce((hash, c) => (hash << 5) - hash + c.charCodeAt(0), 0).toString(16);
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const chr = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + chr;
+                hash |= 0;
+            }
+            return Math.abs(hash).toString(16).padStart(32, '0');
         }
     };
 }
