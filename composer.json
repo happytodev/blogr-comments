@@ -1,0 +1,54 @@
+{
+    "name": "happytodev/blogr-comments",
+    "version": "1.0.0",
+    "type": "library",
+    "description": "Comment system for Blogr CMS — threaded comments, moderation, voting, anti-spam, and notifications",
+    "keywords": ["blogr", "comments", "filamentphp", "blog"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "HappyToDev",
+            "homepage": "https://github.com/happytodev"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../blogr"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "happytodev/blogr": "*",
+        "laravel/framework": "^12.0",
+        "filament/filament": "^4.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Happytodev\\BlogrComments\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Happytodev\\BlogrComments\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Happytodev\\BlogrComments\\BlogrCommentsServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
