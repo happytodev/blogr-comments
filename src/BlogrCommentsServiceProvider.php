@@ -64,20 +64,26 @@ class BlogrCommentsServiceProvider extends ServiceProvider
             if (! $this->isExtensionEnabled()) {
                 return;
             }
+        });
 
-            $postSlug = $view->getData()['slug'] ?? request()->route('slug') ?? '';
+        $this->app['view']->composer('blogr::blog.show', function (View $view) {
+            if (! $this->isExtensionEnabled()) {
+                return;
+            }
 
-            if (! $postSlug) {
+            $post = $view->getData()['post'] ?? null;
+
+            if (! $post) {
                 return;
             }
 
             $commentsView = view('blogr-comments::comments', [
-                'postSlug' => $postSlug,
+                'postSlug' => $post->slug,
                 'comments' => collect([]),
                 'sort' => 'newest',
             ])->render();
 
-            $view->getFactory()->inject('comments', $commentsView);
+            $view->getFactory()->startPush('comments', $commentsView);
         });
     }
 
