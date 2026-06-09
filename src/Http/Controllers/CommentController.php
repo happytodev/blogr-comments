@@ -6,7 +6,6 @@ use Happytodev\BlogrComments\Models\Comment;
 use Happytodev\BlogrComments\Services\CommentService;
 use Happytodev\BlogrComments\Services\SpamService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\View\View;
@@ -20,11 +19,6 @@ class CommentController extends Controller
 
     public function index(string $postSlug, Request $request): View|JsonResponse
     {
-        \Log::debug('CommentController::index called', [
-            'postSlug' => $postSlug,
-            'method' => $request->method(),
-        });
-
         $sort = $request->get('sort', 'newest');
         $comments = $this->commentService->getComments($postSlug, $sort);
 
@@ -40,14 +34,6 @@ class CommentController extends Controller
 
     public function store(string $postSlug, Request $request): JsonResponse
     {
-        \Log::debug('CommentController::store called', [
-            'postSlug' => $postSlug,
-            'method' => $request->method(),
-            'url' => $request->fullUrl(),
-            'ip' => $request->ip(),
-            'headers' => $request->headers->all(),
-        ]);
-
         $validated = $request->validate([
             'author_name' => 'required|string|max:100',
             'author_email' => 'required|email|max:255',
