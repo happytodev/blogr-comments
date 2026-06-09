@@ -3,7 +3,7 @@
 [![Latest Version](https://img.shields.io/packagist/v/happytodev/blogr-comments.svg?style=flat-square)](https://packagist.org/packages/happytodev/blogr-comments)
 [![Tests](https://img.shields.io/github/actions/workflow/status/happytodev/blogr-comments/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/happytodev/blogr-comments/actions)
 [![PHP Version](https://img.shields.io/packagist/php-v/happytodev/blogr-comments?style=flat-square)](https://packagist.org/packages/happytodev/blogr-comments)
-[![Downloads](https://img.shields.io/packagist/dt/happytodev/blogr-comments?style=flat-square)](https://packagist.org/packages/happytodev/blogr-comments)
+[![Total Downloads](https://img.shields.io/packagist/dt/happytodev/blogr-comments?style=flat-square)](https://packagist.org/packages/happytodev/blogr-comments)
 [![GitHub Stars](https://img.shields.io/github/stars/happytodev/blogr-comments?style=flat-square)](https://github.com/happytodev/blogr-comments)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
