@@ -127,11 +127,13 @@ function comments() {
         form: { author_name: '', author_email: '', content: '' },
 
         init(slug) {
+            if (! slug) return;
             this.postSlug = slug;
             this.loadComments();
         },
 
         loadComments() {
+            if (! this.postSlug) return;
             fetch('/comments/' + this.postSlug + '?sort=' + this.sort, {
                 headers: { 'Accept': 'application/json' }
             })
