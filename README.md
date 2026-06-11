@@ -13,10 +13,10 @@
 
 ### 🔧 Core
 - **Threaded comments** — Nested replies with configurable depth (1–10 levels) and dedicated partials for each level
-- **Markdown formatting** — Bold, italic, code blocks (with syntax highlighting via `scrivo/highlight.php`), inline code, blockquotes, links
+- **Markdown formatting** — Bold, italic, code blocks (with syntax highlighting via `scrivo/highlight.php`), inline code, links, H2
 - **Live preview** — See formatted content before posting
 - **Character counter** — Configurable max length (default 5000) with real-time countdown
-- **Toolbar** — Bold, italic, H2, blockquote, link, code block, preview buttons (safe Markdown subset)
+- **Toolbar** — Bold, italic, H2, link, code block, preview buttons (safe Markdown subset)
 
 ### 🛡️ Moderation & Anti-spam
 - **3 moderation modes** — Pre-moderation (all pending), post-moderation (auto-publish), trust system (auto-trust after N approved comments)
@@ -26,9 +26,9 @@
 - **Email-based quick moderation** — Signed URL approve/reject links in notification emails
 
 ### 📬 Notifications
-- **New comment alert** — Notify site owner on every new comment (or daily digest)
-- **Reply notification** — Auto-notify parent commenter when someone replies, with opt-out link
-- **Comment subscriptions** — Auto-subscribe on comment, unsubscribe via token link in email
+- **New comment alert** — Notify site owner on every new comment (or daily digest or weekly digest)
+- **Reply notification** — Possibility to auto-notify parent commenter when someone replies, with opt-out link
+- **Comment subscriptions** — Auto-subscribe on comment for reply notifications
 - **Daily digest** — Configurable email digest of pending comments
 
 ### 🗳️ Voting
