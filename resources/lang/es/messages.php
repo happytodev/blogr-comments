@@ -43,6 +43,9 @@ return [
     'approve' => 'Aprobar',
     'reject' => 'Rechazar',
     'mark_spam' => 'Marcar como spam',
+    'admin_comment_approved' => 'Comentario aprobado',
+    'admin_comment_rejected' => 'Comentario rechazado',
+    'admin_comment_marked_spam' => 'Comentario marcado como spam',
     'search' => 'Buscar comentarios...',
     'comment_details' => 'Detalles del comentario',
     'author_info' => 'Información del autor',
@@ -57,4 +60,21 @@ return [
     'reply_body' => ':author respondió a su comentario en ":post".',
     'reply_cta' => 'Ver respuesta',
     'unsubscribe' => 'Darse de baja',
+
+    // Digests
+    'digest_daily_subject' => 'Resumen diario de comentarios',
+    'digest_weekly_subject' => 'Resumen semanal de comentarios',
+    'digest_comment_count' => ':count nuevos comentarios',
+    'digest_more_comments' => 'Y :count comentarios más...',
+    'digest_view_post' => 'Ver artículo',
+    'digest_footer' => 'Este es un resumen automático de su blog.',
+
+    // Markdown toolbar
+    'bold' => 'Negrita',
+    'italic' => 'Cursiva',
+    'inline_code' => 'Código en línea',
+    'link' => 'Enlace',
+    'preview' => 'Vista previa',
+    'copy_link' => 'Copiar enlace',
+    'copied' => '¡Copiado!',
 ];

@@ -45,6 +45,9 @@ return [
     'approve' => 'Approve',
     'reject' => 'Reject',
     'mark_spam' => 'Mark as Spam',
+    'admin_comment_approved' => 'Comment approved',
+    'admin_comment_rejected' => 'Comment rejected',
+    'admin_comment_marked_spam' => 'Comment marked as spam',
     'bulk_approve' => 'Approve Selected',
     'bulk_reject' => 'Reject Selected',
     'bulk_spam' => 'Mark Selected as Spam',
@@ -68,4 +71,21 @@ return [
     'reply_body' => ':author replied to your comment on ":post".',
     'reply_cta' => 'View Reply',
     'unsubscribe' => 'Unsubscribe',
+
+    // Digests
+    'digest_daily_subject' => 'Daily comment digest',
+    'digest_weekly_subject' => 'Weekly comment digest',
+    'digest_comment_count' => ':count new comments',
+    'digest_more_comments' => 'And :count more comments...',
+    'digest_view_post' => 'View Post',
+    'digest_footer' => 'This is an automated digest from your blog.',
+
+    // Markdown toolbar
+    'bold' => 'Bold',
+    'italic' => 'Italic',
+    'inline_code' => 'Inline code',
+    'link' => 'Link',
+    'preview' => 'Preview',
+    'copy_link' => 'Copy link',
+    'copied' => 'Copied!',
 ];

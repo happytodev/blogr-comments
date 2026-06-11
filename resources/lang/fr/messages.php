@@ -44,6 +44,9 @@ return [
     'approve' => 'Approuver',
     'reject' => 'Rejeter',
     'mark_spam' => 'Marquer comme spam',
+    'admin_comment_approved' => 'Commentaire approuvé',
+    'admin_comment_rejected' => 'Commentaire rejeté',
+    'admin_comment_marked_spam' => 'Commentaire marqué comme spam',
     'bulk_approve' => 'Approuver la sélection',
     'bulk_reject' => 'Rejeter la sélection',
     'bulk_spam' => 'Marquer la sélection comme spam',
@@ -66,4 +69,21 @@ return [
     'reply_body' => ':author a répondu à votre commentaire sur ":post".',
     'reply_cta' => 'Voir la réponse',
     'unsubscribe' => 'Se désabonner',
+
+    // Digests
+    'digest_daily_subject' => 'Récapitulatif quotidien des commentaires',
+    'digest_weekly_subject' => 'Récapitulatif hebdomadaire des commentaires',
+    'digest_comment_count' => ':count nouveaux commentaires',
+    'digest_more_comments' => 'Et :count commentaires supplémentaires...',
+    'digest_view_post' => 'Voir l\'article',
+    'digest_footer' => 'Ceci est un récapitulatif automatique de votre blog.',
+
+    // Markdown toolbar
+    'bold' => 'Gras',
+    'italic' => 'Italique',
+    'inline_code' => 'Code en ligne',
+    'link' => 'Lien',
+    'preview' => 'Aperçu',
+    'copy_link' => 'Copier le lien',
+    'copied' => 'Copié !',
 ];
