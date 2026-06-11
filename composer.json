@@ -1,6 +1,6 @@
 {
     "name": "happytodev/blogr-comments",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "type": "library",
     "description": "Comment system for Blogr CMS — threaded comments, moderation, voting, anti-spam, and notifications",
     "keywords": ["blogr", "comments", "filamentphp", "blog"],
