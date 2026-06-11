@@ -4,16 +4,18 @@ namespace Happytodev\BlogrComments;
 
 use Filament\Facades\Filament;
 use Filament\PanelRegistry;
-use Filament\Support\Facades\FilamentComponent;
-use Livewire\Livewire;
-use Livewire\Mechanisms\ComponentRegistry;
 use Happytodev\Blogr\Services\ExtensionRegistry;
+use Happytodev\BlogrComments\Console\Commands\SendCommentDigest;
 use Happytodev\BlogrComments\Filament\Pages\CommentSettings;
-use Happytodev\BlogrComments\Filament\Widgets\PendingCommentsWidget;
 use Happytodev\BlogrComments\Http\Middleware\ThrottleComments;
+use Happytodev\BlogrComments\Models\Comment;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View;
+use Livewire\Livewire;
+use Livewire\Mechanisms\ComponentRegistry;
 
 class BlogrCommentsServiceProvider extends ServiceProvider
 {
@@ -50,6 +52,7 @@ class BlogrCommentsServiceProvider extends ServiceProvider
 
         $this->registerExtensions();
         $this->registerBladeStacks();
+        $this->registerBlogCardCommentCounts();
         $this->registerFilamentPages();
         $this->registerMiddleware();
         $this->registerCommands();
@@ -89,7 +92,60 @@ class BlogrCommentsServiceProvider extends ServiceProvider
             ])->render();
 
             $view->getFactory()->startPush('comments', $commentsView);
+
+            if (config('blogr-comments.display.show_comment_count_on_articles', true)) {
+                $commentCount = Comment::where('post_slug', $post->slug)
+                    ->where('status', 'approved')
+                    ->count();
+
+                if ($commentCount > 0) {
+                    $badge = sprintf(
+                        '<a href="#comments" class="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-[var(--color-primary)] dark:hover:text-[var(--color-primary-dark)] transition-colors" title="%s">'
+                        . '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">'
+                        . '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>'
+                        . '</svg><span>%d</span></a>',
+                        __('blogr-comments::messages.comments'),
+                        $commentCount
+                    );
+
+                    $view->getFactory()->startPush('blogr-post-article-meta', $badge);
+                }
+            }
         });
+    }
+
+    protected function registerBlogCardCommentCounts(): void
+    {
+        if (! $this->isExtensionEnabled()) {
+            return;
+        }
+
+        if (! config('blogr-comments.display.show_comment_count_on_cards', true)) {
+            return;
+        }
+
+        $views = ['blogr::blog.index', 'blogr::blog.category', 'blogr::blog.tag'];
+
+        foreach ($views as $viewName) {
+            $this->app['view']->composer($viewName, function (View $view) {
+                $posts = $view->getData()['posts'] ?? collect();
+
+                if ($posts->isEmpty()) {
+                    return;
+                }
+
+                $slugs = $posts->pluck('slug');
+                $counts = Comment::whereIn('post_slug', $slugs)
+                    ->where('status', 'approved')
+                    ->groupBy('post_slug')
+                    ->selectRaw('post_slug, count(*) as count')
+                    ->pluck('count', 'post_slug');
+
+                foreach ($posts as $post) {
+                    $post->comment_count = (int) ($counts[$post->slug] ?? 0);
+                }
+            });
+        }
     }
 
     protected function registerFilamentPages(): void
@@ -118,6 +174,14 @@ class BlogrCommentsServiceProvider extends ServiceProvider
             app(ComponentRegistry::class)->getName(CommentSettings::class),
             CommentSettings::class,
         );
+
+        $slug = CommentSettings::getSlug($panel);
+        $path = trim($panel->getPath(), '/') . '/' . ltrim($slug, '/');
+        $middleware = array_merge($panel->getMiddleware(), $panel->getAuthMiddleware());
+
+        Route::get($path, CommentSettings::class)
+            ->middleware($middleware)
+            ->name('filament.' . $panel->getId() . '.pages.' . $slug);
     }
 
     protected function registerMiddleware(): void
@@ -129,8 +193,26 @@ class BlogrCommentsServiceProvider extends ServiceProvider
     protected function registerCommands(): void
     {
         if ($this->app->runningInConsole()) {
-            //
+            $this->commands([SendCommentDigest::class]);
         }
+
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+            $frequency = config('blogr-comments.notifications.admin_frequency', 'immediate');
+
+            if ($frequency === 'daily') {
+                $time = config('blogr-comments.notifications.digest_time', '09:00');
+                [$hour, $minute] = explode(':', $time);
+                $schedule->command('blogr-comments:send-digest', ['--period' => 'daily'])
+                    ->dailyAt(sprintf('%02d:%02d', (int) $hour, (int) $minute));
+            } elseif ($frequency === 'weekly') {
+                $time = config('blogr-comments.notifications.digest_time', '09:00');
+                $day = config('blogr-comments.notifications.digest_day', 'monday');
+                [$hour, $minute] = explode(':', $time);
+                $schedule->command('blogr-comments:send-digest', ['--period' => 'weekly'])
+                    ->weeklyOn($day, sprintf('%02d:%02d', (int) $hour, (int) $minute));
+            }
+        });
     }
 
     protected function isExtensionEnabled(): bool
