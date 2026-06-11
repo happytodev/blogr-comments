@@ -7,22 +7,51 @@
 [![GitHub Stars](https://img.shields.io/github/stars/happytodev/blogr-comments?style=flat-square)](https://github.com/happytodev/blogr-comments)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
-**A full-featured comment system for Blogr CMS** — threaded comments, moderation, voting, anti-spam, and email notifications.
-
----
+**A full-featured comment system for Blogr CMS** — threaded comments, moderation, voting, anti-spam, email notifications, and a complete Filament admin interface.
 
 ## Features
 
-- **Threaded comments** — Nested replies with configurable depth (up to 10 levels)
-- **Voting system** — Up/down votes with anti-doublon by IP
-- **Markdown formatting** — Bold, italic, code blocks, links, blockquotes
-- **3 moderation modes** — Pre-moderation, post-moderation, or trust system
-- **Anti-spam multilayered** — Cloudflare Turnstile + StopForumSpam + Akismet (optional)
-- **Rate limiting** — Configurable per-IP limits for comments and votes
-- **Email notifications** — New comment (to owner) + reply notifications (to commenters)
-- **Filament admin** — Full moderation interface with bulk actions and dashboard widgets
-- **Gravatar support** — Automatic avatars via email hash
-- **Multilingual** — EN, FR, ES, DE included
+### 🔧 Core
+- **Threaded comments** — Nested replies with configurable depth (1–10 levels) and dedicated partials for each level
+- **Markdown formatting** — Bold, italic, code blocks (with syntax highlighting via `scrivo/highlight.php`), inline code, blockquotes, links
+- **Live preview** — See formatted content before posting
+- **Character counter** — Configurable max length (default 5000) with real-time countdown
+- **Toolbar** — Bold, italic, H2, blockquote, link, code block, preview buttons (safe Markdown subset)
+
+### 🛡️ Moderation & Anti-spam
+- **3 moderation modes** — Pre-moderation (all pending), post-moderation (auto-publish), trust system (auto-trust after N approved comments)
+- **Multi-layer anti-spam** — Cloudflare Turnstile (free, invisible), StopForumSpam API (free), Akismet API (paid, optional), local keyword/link filters
+- **Rate limiting** — Per-IP throttling for comments (configurable per hour) and votes (per minute) via dedicated middleware
+- **Admin moderation** — Approve, reject, mark as spam, or delete individually or in bulk
+- **Email-based quick moderation** — Signed URL approve/reject links in notification emails
+
+### 📬 Notifications
+- **New comment alert** — Notify site owner on every new comment (or daily digest)
+- **Reply notification** — Auto-notify parent commenter when someone replies, with opt-out link
+- **Comment subscriptions** — Auto-subscribe on comment, unsubscribe via token link in email
+- **Daily digest** — Configurable email digest of pending comments
+
+### 🗳️ Voting
+- **Up/down voting** — IP + User-Agent based anti-doublon protection
+- **Denormalized score** — `vote_score` column on comments for fast sorting
+- **Sort options** — Newest, oldest, best (by score)
+
+### ⚙️ Filament Admin
+- **Comment Resource** — Full list/view with status filters, visible/invisible toggle
+- **Dashboard widget** — Pending comments count with quick link to moderation list
+- **Settings page** — All configuration UI (moderation, notifications, anti-spam, rate limits, nesting depth, display options)
+
+### 🌍 Frontend Display
+- **Syntax highlighting** — Server-side code highlighting with language badge, dark mode support
+- **Per-comment permalink** — 🔗 button copies sharable URL with `#comment-{id}` anchor
+- **Smart anchor scrolling** — Dynamic scroll offset accounts for fixed/sticky navigation and mobile viewport
+- **Comment count on articles** — Shows count in card date line and article metadata (configurable)
+- **Gravatar support** — Automatic avatars via email MD5 hash
+- **Multilingual** — Complete EN, FR, ES, DE translations for frontend, admin, and email templates
+
+### 🔌 Extension Points
+- **BlogrExtension interface** — Registers as `blogr-comments` extension, respects enable/disable state
+- **FilamentPlugin** — Auto-registers resource, settings page, and widget in the panel
 
 ## Requirements
 
@@ -78,21 +107,22 @@ Navigate to **Comments** in your Filament admin sidebar to:
 - View all comments sorted by status
 - Filter by status (pending, approved, rejected, spam)
 - Approve, reject, or mark as spam (individual or bulk)
-- View comment details
+- View comment details with full metadata
 
 ### Admin — Settings
 
 Go to **Comments → Settings** to configure:
 - Moderation mode (pre/post/trust)
-- Email notifications (owner + replies)
+- Email notifications (owner + replies + digest)
 - Anti-spam providers
 - Rate limits
 - Nesting depth
+- Display options (comment count on articles)
 
 ## Testing
 
 ```bash
-composer test
+vendor/bin/pest
 ```
 
 ## Changelog
