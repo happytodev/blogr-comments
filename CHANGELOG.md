@@ -2,6 +2,45 @@
 
 All notable changes to `blogr-comments` will be documented in this file.
 
+## v1.1.0 - 2026-06-11
+
+### ✨ Features
+
+- **Syntax highlighting**: Server-side code highlighting via `scrivo/highlight.php` with language badge and dark mode support
+- **Per-comment permalink**: 🔗 button copies sharable URL with `#comment-{id}` anchor
+- **Smart anchor scrolling**: Dynamic scroll offset for fixed/sticky navigation + mobile viewport
+- **Character counter**: Real-time countdown with configurable `max_comment_length`
+- **H2 toolbar button**: Insert `## ` heading in the Markdown editor
+- **422 error display**: Show validation error on `content` field instead of generic error
+- **Comment count on articles**: Configurable toggle in settings, shown in card date line and article meta
+- **Configurable max length**: `max_comment_length` setting in config and Filament UI
+- **Preview route**: `POST /comments/preview` endpoint for client-side preview
+- **ViewComment infolist**: Structured detail view with content, author, and metadata sections
+- **Email-based moderation**: Signed URL approve/reject links in notification emails
+- **Daily digest**: Configurable email digest of pending comments
+- **Article meta stack**: `@stack('blogr-post-article-meta')` for extensibility
+
+### 🐛 Bug Fixes
+
+- **Namespace fix**: `Filament\Tables\Actions\BulkAction` → `Filament\Actions\BulkAction`
+- **Parse error**: Typo `}` instead of `]` in Log::debug array close
+- **Alpine null check**: Guard against undefined `replyTo` in Alpine component
+- **Livewire registration**: Explicit `Livewire::component()` for `CommentSettings`
+- **JSON API rewrite**: Return JSON from `CommentController`, rewrite Alpine frontend for JSON consumption
+- **View composer**: Use `startPush` instead of `inject` for blog.show compatibility
+- **Form tag**: Replace `x-filament-panels::form` with plain `<form>` tag
+- **PHP 8.4**: Property type covariance for `navigationGroup`/`navigationIcon`, `BadgeColumn` → `TextColumn` with `badge()`
+
+### ⬆️ Dependencies
+
+- Added `scrivo/highlight.php ^9.18`
+
+### ✅ Tests
+
+- `CommentsViewTest`: 4 tests verifying Alpine nav config values and method existence
+- Migrated all tests from `@test` annotations to `#[Test]` attributes (PHPUnit 12 / Pest 4.7 compatibility)
+- Fixed `MissingAppKeyException` in testbench, fixed `created_at` mass-assignment in sort tests
+
 ## v1.0.0 - 2026-06-09
 
 ### ✨ Features
