@@ -2,80 +2,70 @@
 
 namespace Happytodev\BlogrComments\Services;
 
+use League\CommonMark\Environment\Environment;
+use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
+use League\CommonMark\MarkdownConverter;
+
 class CommentRenderer
 {
+    protected MarkdownConverter $converter;
+
+    protected bool $highlighterAvailable;
+
+    public function __construct()
+    {
+        $environment = new Environment([
+            'html_input' => 'escape',
+            'allow_unsafe_links' => false,
+            'max_nesting_level' => 10,
+        ]);
+
+        $environment->addExtension(new CommonMarkCoreExtension);
+
+        $this->converter = new MarkdownConverter($environment);
+        $this->highlighterAvailable = class_exists(\Highlight\Highlighter::class);
+    }
+
     public function toHtml(string $markdown): string
     {
-        $html = htmlspecialchars($markdown, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $html = $this->converter->convert($markdown)->getContent();
 
-        $html = $this->renderBold($html);
-        $html = $this->renderItalic($html);
-        $html = $this->renderInlineCode($html);
-        $html = $this->renderCodeBlocks($html);
-        $html = $this->renderBlockquotes($html);
-        $html = $this->renderLinks($html);
-        $html = $this->renderParagraphs($html);
+        if ($this->highlighterAvailable) {
+            $html = $this->highlightCodeBlocks($html);
+        }
 
         return $html;
     }
 
-    protected function renderBold(string $html): string
+    protected function highlightCodeBlocks(string $html): string
     {
-        return preg_replace('/\*\*(.+?)\*\*/', '<strong>$1</strong>', $html);
-    }
+        $highlighter = new \Highlight\Highlighter;
+        $highlighter->setAutodetectLanguages(['php', 'js', 'html', 'css', 'bash', 'json', 'xml', 'yaml', 'twig', 'blade']);
 
-    protected function renderItalic(string $html): string
-    {
-        return preg_replace('/\*(.+?)\*/', '<em>$1</em>', $html);
-    }
+        return preg_replace_callback(
+            '/<pre><code class="language-(\w+)">(.*?)<\/code><\/pre>/s',
+            function (array $matches) use ($highlighter) {
+                $lang = $matches[1];
+                $code = htmlspecialchars_decode($matches[2]);
+                $code = rtrim($code, "\n");
 
-    protected function renderInlineCode(string $html): string
-    {
-        return preg_replace('/`(.+?)`/', '<code>$1</code>', $html);
-    }
+                try {
+                    $result = $highlighter->highlight($lang, $code);
+                    $highlighted = $result->value;
+                } catch (\DomainException) {
+                    $highlighted = htmlspecialchars($code);
+                }
 
-    protected function renderCodeBlocks(string $html): string
-    {
-        return preg_replace('/```(\w*)\n(.*?)```/s', '<pre><code>$2</code></pre>', $html);
-    }
+                $badge = sprintf('<span class="blogr-code-lang">%s</span>', htmlspecialchars($lang));
 
-    protected function renderBlockquotes(string $html): string
-    {
-        return preg_replace('/^&gt;\s?(.*)$/m', '<blockquote>$1</blockquote>', $html);
-    }
-
-    protected function renderLinks(string $html): string
-    {
-        return preg_replace(
-            '/\[([^\]]+)\]\(([^)]+)\)/',
-            '<a href="$2" rel="nofollow noopener" target="_blank">$1</a>',
+                return sprintf(
+                    '<pre><code class="language-%s hljs">%s</code>%s</pre>',
+                    htmlspecialchars($lang),
+                    $highlighted,
+                    $badge
+                );
+            },
             $html
         );
-    }
-
-    protected function renderParagraphs(string $html): string
-    {
-        $html = preg_replace('/<\/blockquote>\s*<blockquote>/', "\n", $html);
-        $html = preg_replace('/<pre><code>.*?<\/code><\/pre>/s', "\n$0\n", $html);
-
-        $paragraphs = preg_split('/\n{2,}/', $html);
-        $result = [];
-
-        foreach ($paragraphs as $paragraph) {
-            $paragraph = trim($paragraph);
-
-            if (empty($paragraph)) {
-                continue;
-            }
-
-            if (str_starts_with($paragraph, '<blockquote>') || str_starts_with($paragraph, '<pre>')) {
-                $result[] = $paragraph;
-            } else {
-                $paragraph = str_replace("\n", '<br>', $paragraph);
-                $result[] = '<p>' . $paragraph . '</p>';
-            }
-        }
-
-        return implode("\n", $result);
     }
 }
