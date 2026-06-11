@@ -22,6 +22,9 @@ Route::middleware('web')->group(function () {
         ->name('comments.vote');
 });
 
+Route::get('/comments/subscriptions/{token}/unsubscribe', [CommentController::class, 'unsubscribe'])
+    ->name('comments.unsubscribe');
+
 Route::get('/admin/comments/{comment}/moderate/{action}', [AdminCommentController::class, 'moderate'])
     ->middleware(['web', 'auth', 'signed'])
     ->name('admin.comments.moderate');

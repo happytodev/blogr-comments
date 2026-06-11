@@ -140,7 +140,7 @@ class CommentService
             foreach ($subscriptions as $subscription) {
                 if ($subscription->email !== $comment->author_email) {
                     Notification::route('mail', $subscription->email)
-                        ->notify(new ReplyNotification($comment));
+                        ->notify(new ReplyNotification($comment, $subscription));
                 }
             }
         }

@@ -60,6 +60,9 @@ return [
     'reply_body' => ':author respondió a su comentario en ":post".',
     'reply_cta' => 'Ver respuesta',
     'unsubscribe' => 'Darse de baja',
+    'unsubscribed_title' => 'Dado de baja',
+    'unsubscribed_body' => 'Ha sido dado de baja de las notificaciones de respuesta para :email.',
+    'back_to_post' => 'Volver al artículo',
 
     // Digests
     'digest_daily_subject' => 'Resumen diario de comentarios',

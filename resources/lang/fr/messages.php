@@ -69,6 +69,9 @@ return [
     'reply_body' => ':author a répondu à votre commentaire sur ":post".',
     'reply_cta' => 'Voir la réponse',
     'unsubscribe' => 'Se désabonner',
+    'unsubscribed_title' => 'Désabonné',
+    'unsubscribed_body' => 'Vous avez été désabonné des notifications de réponse pour :email.',
+    'back_to_post' => 'Retour à l\'article',
 
     // Digests
     'digest_daily_subject' => 'Récapitulatif quotidien des commentaires',

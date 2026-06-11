@@ -71,6 +71,9 @@ return [
     'reply_body' => ':author replied to your comment on ":post".',
     'reply_cta' => 'View Reply',
     'unsubscribe' => 'Unsubscribe',
+    'unsubscribed_title' => 'Unsubscribed',
+    'unsubscribed_body' => 'You have been unsubscribed from reply notifications for :email.',
+    'back_to_post' => 'Back to post',
 
     // Digests
     'digest_daily_subject' => 'Daily comment digest',

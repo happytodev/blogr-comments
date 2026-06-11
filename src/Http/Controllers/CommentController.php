@@ -3,6 +3,7 @@
 namespace Happytodev\BlogrComments\Http\Controllers;
 
 use Happytodev\BlogrComments\Models\Comment;
+use Happytodev\BlogrComments\Models\CommentSubscription;
 use Happytodev\BlogrComments\Services\CommentRenderer;
 use Happytodev\BlogrComments\Services\CommentService;
 use Happytodev\BlogrComments\Services\SpamService;
@@ -136,5 +137,20 @@ class CommentController extends Controller
         }
 
         return $this->getDepth($comment->parent, $depth + 1);
+    }
+
+    public function unsubscribe(string $token): View
+    {
+        $subscription = CommentSubscription::where('token', $token)->first();
+
+        if (! $subscription) {
+            abort(404);
+        }
+
+        $email = $subscription->email;
+        $postSlug = $subscription->comment->post_slug;
+        $subscription->delete();
+
+        return view('blogr-comments::unsubscribe', compact('email', 'postSlug'));
     }
 }

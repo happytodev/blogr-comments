@@ -60,6 +60,9 @@ return [
     'reply_body' => ':author hat auf Ihren Kommentar zu ":post" geantwortet.',
     'reply_cta' => 'Antwort ansehen',
     'unsubscribe' => 'Abmelden',
+    'unsubscribed_title' => 'Abgemeldet',
+    'unsubscribed_body' => 'Sie wurden von Reply-Benachrichtigungen für :email abgemeldet.',
+    'back_to_post' => 'Zurück zum Beitrag',
 
     // Digests
     'digest_daily_subject' => 'Tägliche Kommentarübersicht',
