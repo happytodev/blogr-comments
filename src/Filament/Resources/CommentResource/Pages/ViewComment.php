@@ -3,19 +3,20 @@
 namespace Happytodev\BlogrComments\Filament\Resources\CommentResource\Pages;
 
 use Filament\Actions;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 use Filament\Resources\Pages\ViewRecord;
 use Happytodev\BlogrComments\Filament\Resources\CommentResource;
+use Illuminate\Support\Facades\URL;
 
 class ViewComment extends ViewRecord
 {
     protected static string $resource = CommentResource::class;
 
-    public function infolist(Infolist $infolist): Infolist
+    public function infolist(Schema $schema): Schema
     {
-        return $infolist
+        return $schema
             ->schema([
                 Section::make(__('blogr-comments::messages.comment'))
                     ->schema([
@@ -66,17 +67,26 @@ class ViewComment extends ViewRecord
             Actions\Action::make('approve')
                 ->label(__('blogr-comments::messages.approve'))
                 ->color('success')
-                ->action(fn () => $this->record->update(['status' => 'approved']))
+                ->url(fn () => URL::signedRoute('admin.comments.moderate', [
+                    'comment' => $this->record,
+                    'action' => 'approve',
+                ]))
                 ->visible(fn () => $this->record->status !== 'approved'),
             Actions\Action::make('reject')
                 ->label(__('blogr-comments::messages.reject'))
                 ->color('danger')
-                ->action(fn () => $this->record->update(['status' => 'rejected']))
+                ->url(fn () => URL::signedRoute('admin.comments.moderate', [
+                    'comment' => $this->record,
+                    'action' => 'reject',
+                ]))
                 ->visible(fn () => $this->record->status !== 'rejected'),
             Actions\Action::make('spam')
                 ->label(__('blogr-comments::messages.mark_spam'))
                 ->color('gray')
-                ->action(fn () => $this->record->update(['status' => 'spam']))
+                ->url(fn () => URL::signedRoute('admin.comments.moderate', [
+                    'comment' => $this->record,
+                    'action' => 'spam',
+                ]))
                 ->visible(fn () => $this->record->status !== 'spam'),
         ];
     }
