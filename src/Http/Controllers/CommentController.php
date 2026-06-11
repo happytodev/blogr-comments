@@ -3,6 +3,7 @@
 namespace Happytodev\BlogrComments\Http\Controllers;
 
 use Happytodev\BlogrComments\Models\Comment;
+use Happytodev\BlogrComments\Services\CommentRenderer;
 use Happytodev\BlogrComments\Services\CommentService;
 use Happytodev\BlogrComments\Services\SpamService;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +16,7 @@ class CommentController extends Controller
     public function __construct(
         protected CommentService $commentService,
         protected SpamService $spamService,
+        protected CommentRenderer $renderer,
     ) {}
 
     public function index(string $postSlug, Request $request): View|JsonResponse
@@ -26,7 +28,7 @@ class CommentController extends Controller
             return response()->json([
                 'comments' => $comments,
                 'total' => $comments->count(),
-            ]);
+            ])->header('Cache-Control', 'no-cache, no-store, must-revalidate');
         }
 
         return view('blogr-comments::comments', compact('comments', 'postSlug', 'sort'));
@@ -34,10 +36,12 @@ class CommentController extends Controller
 
     public function store(string $postSlug, Request $request): JsonResponse
     {
+        $maxLength = config('blogr-comments.editing.max_comment_length', 5000);
+
         $validated = $request->validate([
             'author_name' => 'required|string|max:100',
             'author_email' => 'required|email|max:255',
-            'content' => 'required|string|min:2|max:5000',
+            'content' => 'required|string|min:2|max:' . $maxLength,
             'captcha_token' => 'nullable|string',
         ]);
 
@@ -55,7 +59,7 @@ class CommentController extends Controller
             return response()->json(['comment_status' => 'spam']);
         }
 
-        $this->commentService->createComment([
+        $comment = $this->commentService->createComment([
             'post_slug' => $postSlug,
             'parent_id' => null,
             'author_name' => $validated['author_name'],
@@ -63,15 +67,17 @@ class CommentController extends Controller
             'content' => $validated['content'],
         ], $request->ip(), $request->userAgent());
 
-        return response()->json(['comment_status' => 'submitted']);
+        return response()->json(['comment_status' => $comment->status]);
     }
 
     public function reply(Comment $comment, Request $request): JsonResponse
     {
+        $maxLength = config('blogr-comments.editing.max_comment_length', 5000);
+
         $validated = $request->validate([
             'author_name' => 'required|string|max:100',
             'author_email' => 'required|email|max:255',
-            'content' => 'required|string|min:2|max:5000',
+            'content' => 'required|string|min:2|max:' . $maxLength,
         ]);
 
         $depth = $this->getDepth($comment);
@@ -84,13 +90,26 @@ class CommentController extends Controller
             return response()->json(['comment_status' => 'spam']);
         }
 
-        $this->commentService->createReply($comment, [
+        $reply = $this->commentService->createReply($comment, [
             'author_name' => $validated['author_name'],
             'author_email' => $validated['author_email'],
             'content' => $validated['content'],
         ], $request->ip(), $request->userAgent());
 
-        return response()->json(['comment_status' => 'submitted']);
+        return response()->json(['comment_status' => $reply->status]);
+    }
+
+    public function preview(Request $request): JsonResponse
+    {
+        $maxLength = config('blogr-comments.editing.max_comment_length', 5000);
+
+        $validated = $request->validate([
+            'content' => 'required|string|max:' . $maxLength,
+        ]);
+
+        return response()->json([
+            'html' => $this->renderer->toHtml($validated['content']),
+        ]);
     }
 
     public function vote(Comment $comment, Request $request): JsonResponse

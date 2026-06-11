@@ -66,6 +66,12 @@ class CommentService
 
     public function vote(Comment $comment, int $voteType, string $ip, ?string $userAgent): int
     {
+        if (! config('blogr-comments.voting.allow_self_vote', true)) {
+            if ($comment->ip_address === $ip) {
+                return $comment->vote_score;
+            }
+        }
+
         $existing = CommentVote::where('comment_id', $comment->id)
             ->where('ip_address', $ip)
             ->where('user_agent', $userAgent)
@@ -115,7 +121,9 @@ class CommentService
 
     protected function dispatchNotifications(Comment $comment): void
     {
-        if (config('blogr-comments.notifications.new_comment', true)) {
+        $frequency = config('blogr-comments.notifications.admin_frequency', 'immediate');
+
+        if ($frequency === 'immediate' && config('blogr-comments.notifications.new_comment', true)) {
             $ownerEmail = config('blogr-comments.notifications.owner_email')
                 ?: config('mail.from.address');
 

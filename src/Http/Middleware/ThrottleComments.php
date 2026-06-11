@@ -21,6 +21,14 @@ class ThrottleComments
         if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {
             $seconds = $this->limiter->availableIn($key);
 
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'error' => __('blogr-comments::messages.rate_limit_exceeded', [
+                        'minutes' => ceil($seconds / 60),
+                    ]),
+                ], 429);
+            }
+
             return back()->withErrors([
                 'rate_limit' => __('blogr-comments::messages.rate_limit_exceeded', [
                     'minutes' => ceil($seconds / 60),
