@@ -12,11 +12,14 @@ return [
         'new_comment' => true,
         'reply' => true,
         'owner_email' => null,
+        'admin_frequency' => 'immediate',   // 'immediate' | 'daily' | 'weekly'
+        'digest_time' => '09:00',
+        'digest_day' => 'monday',
     ],
 
     'spam' => [
         'captcha' => [
-            'provider' => 'turnstile', // 'turnstile' | 'none'
+            'provider' => 'none', // 'turnstile' | 'none'
             'site_key' => env('TURNSTILE_SITE_KEY', ''),
             'secret_key' => env('TURNSTILE_SECRET_KEY', ''),
         ],
@@ -32,7 +35,7 @@ return [
     ],
 
     'rate_limit' => [
-        'comments' => 5,
+        'comments' => 15,
         'votes' => 30,
     ],
 
@@ -40,7 +43,17 @@ return [
         'max_depth' => 3,
     ],
 
+    'display' => [
+        'show_comment_count_on_cards' => true,
+        'show_comment_count_on_articles' => true,
+    ],
+
+    'voting' => [
+        'allow_self_vote' => true,
+    ],
+
     'editing' => [
         'window_minutes' => 15,
+        'max_comment_length' => 5000,
     ],
 ];
