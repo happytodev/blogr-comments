@@ -2,6 +2,12 @@
 
 All notable changes to `blogr-comments` will be documented in this file.
 
+## v1.1.1 - 2026-06-11
+
+### ✨ Features
+
+- **Unsubscribe from reply notifications**: Each reply notification email now includes an unsubscribe link with a unique token. Clicking the link immediately removes the subscription and shows a confirmation page.
+
 ## v1.1.0 - 2026-06-11
 
 ### ✨ Features
