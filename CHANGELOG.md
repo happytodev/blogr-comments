@@ -30,6 +30,7 @@ All notable changes to `blogr-comments` will be documented in this file.
 - **View composer**: Use `startPush` instead of `inject` for blog.show compatibility
 - **Form tag**: Replace `x-filament-panels::form` with plain `<form>` tag
 - **PHP 8.4**: Property type covariance for `navigationGroup`/`navigationIcon`, `BadgeColumn` → `TextColumn` with `badge()`
+- **Gravatar**: Replace broken client-side `md5()` (Java hashCode) with server-side PHP MD5 hash
 
 ### ⬆️ Dependencies
 

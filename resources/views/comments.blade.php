@@ -119,7 +119,7 @@
         <div>
             <div class="blogr-comment" :id="'comment-' + comment.id">
                 <div class="blogr-comment-header">
-                    <img :src="'https://www.gravatar.com/avatar/' + md5(comment.author_email) + '?s=32&d=mp'" class="blogr-avatar" alt="">
+                    <img :src="'https://www.gravatar.com/avatar/' + comment.author_email_hash + '?s=32&d=mp'" class="blogr-avatar" alt="">
                     <div>
                         <span class="blogr-comment-author" x-text="comment.author_name"></span>
                         <span class="blogr-comment-time" x-text="timeAgo(comment.created_at)"></span>
@@ -143,7 +143,7 @@
                     <template x-for="reply in comment.replies" :key="reply.id">
                         <div class="blogr-comment" :id="'comment-' + reply.id">
                             <div class="blogr-comment-header">
-                                <img :src="'https://www.gravatar.com/avatar/' + md5(reply.author_email) + '?s=32&d=mp'" class="blogr-avatar" alt="">
+                                <img :src="'https://www.gravatar.com/avatar/' + reply.author_email_hash + '?s=32&d=mp'" class="blogr-avatar" alt="">
                                 <div>
                                     <span class="blogr-comment-author" x-text="reply.author_name"></span>
                                     <span class="blogr-comment-time" x-text="timeAgo(reply.created_at)"></span>
@@ -403,16 +403,6 @@ function comments() {
             if (diff < 3600) return Math.floor(diff / 60) + 'm';
             if (diff < 86400) return Math.floor(diff / 3600) + 'h';
             return d.toLocaleDateString();
-        },
-
-        md5(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                const chr = str.charCodeAt(i);
-                hash = ((hash << 5) - hash) + chr;
-                hash |= 0;
-            }
-            return Math.abs(hash).toString(16).padStart(32, '0');
         }
     };
 }

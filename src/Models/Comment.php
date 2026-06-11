@@ -22,10 +22,19 @@ class Comment extends Model
         'edited_at',
     ];
 
+    protected $appends = [
+        'author_email_hash',
+    ];
+
     protected $casts = [
         'edited_at' => 'datetime',
         'vote_score' => 'integer',
     ];
+
+    public function getAuthorEmailHashAttribute(): string
+    {
+        return md5(strtolower(trim($this->author_email)));
+    }
 
     public function parent()
     {
