@@ -4,12 +4,14 @@ namespace Happytodev\BlogrComments;
 
 use Filament\Contracts\Plugin as FilamentPlugin;
 use Filament\Panel;
+use Happytodev\Blogr\Concerns\RegistersLinkTypes;
 use Happytodev\Blogr\Contracts\BlogrExtension;
 use Happytodev\BlogrComments\Filament\Pages\CommentSettings;
 use Happytodev\BlogrComments\Filament\Resources\CommentResource;
 
 class BlogrCommentsPlugin implements BlogrExtension, FilamentPlugin
 {
+    use RegistersLinkTypes;
     public function getId(): string
     {
         return 'blogr-comments';
