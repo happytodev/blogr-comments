@@ -8,6 +8,7 @@ use Happytodev\Blogr\Concerns\RegistersLinkTypes;
 use Happytodev\Blogr\Contracts\BlogrExtension;
 use Happytodev\BlogrComments\Filament\Pages\CommentSettings;
 use Happytodev\BlogrComments\Filament\Resources\CommentResource;
+use Illuminate\Support\Facades\DB;
 
 class BlogrCommentsPlugin implements BlogrExtension, FilamentPlugin
 {
@@ -47,8 +48,43 @@ class BlogrCommentsPlugin implements BlogrExtension, FilamentPlugin
         return [];
     }
 
+    public function getSettingsUrl(): ?string
+    {
+        try {
+            $disabled = DB::table('blogr_extension_states')
+                ->where('extension_id', 'blogr-comments')
+                ->whereNotNull('disabled_at')
+                ->exists();
+        } catch (\Throwable) {
+            $disabled = false;
+        }
+
+        if ($disabled) {
+            return null;
+        }
+
+        try {
+            return CommentSettings::getUrl();
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
     public function register(Panel $panel): void
     {
+        try {
+            $disabled = DB::table('blogr_extension_states')
+                ->where('extension_id', 'blogr-comments')
+                ->whereNotNull('disabled_at')
+                ->exists();
+        } catch (\Throwable) {
+            $disabled = false;
+        }
+
+        if ($disabled) {
+            return;
+        }
+
         $panel->resources([
             CommentResource::class,
         ])->pages([

@@ -27,12 +27,23 @@ class BlogrCommentsServiceProvider extends ServiceProvider
 
         $this->callAfterResolving(PanelRegistry::class, function (PanelRegistry $registry) {
             $panel = $registry->get('admin');
+
+            if (! $panel) {
+                return;
+            }
+
             $panel->plugin(new BlogrCommentsPlugin);
         });
     }
 
     public function boot(): void
     {
+        $this->registerExtensions();
+
+        if (! $this->isExtensionEnabled()) {
+            return;
+        }
+
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'blogr-comments');
         $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'blogr-comments');
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
@@ -50,7 +61,6 @@ class BlogrCommentsServiceProvider extends ServiceProvider
             __DIR__ . '/../resources/lang' => lang_path('vendor/blogr-comments'),
         ], 'blogr-comments-lang');
 
-        $this->registerExtensions();
         $this->registerBladeStacks();
         $this->registerBlogCardCommentCounts();
         $this->registerFilamentPages();

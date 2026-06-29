@@ -9,6 +9,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
+use Happytodev\Blogr\Services\ExtensionRegistry;
 use Illuminate\Support\Facades\Artisan;
 use Filament\Schemas\Schema;
 
@@ -23,6 +24,15 @@ class CommentSettings extends Page
     protected static ?string $title = 'Comment Settings';
 
     protected string $view = 'blogr-comments::filament.pages.comment-settings';
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        if (! app()->has(ExtensionRegistry::class)) {
+            return true;
+        }
+
+        return app(ExtensionRegistry::class)->isEnabled('blogr-comments');
+    }
 
     public string $moderation_mode = 'post';
     public int $trust_threshold = 3;
