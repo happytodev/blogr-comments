@@ -2,6 +2,12 @@
 
 All notable changes to `blogr-comments` will be documented in this file.
 
+## v1.1.2 - 2026-06-29
+
+### 🐛 Bug Fixes
+
+- **Plugin**: add `RegistersLinkTypes` trait for LinkTypeRegistry support (required by Blogr v1.19.0)
+
 ## v1.1.1 - 2026-06-11
 
 ### ✨ Features
