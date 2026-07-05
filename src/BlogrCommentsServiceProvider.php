@@ -16,6 +16,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View;
 use Livewire\Livewire;
 use Livewire\Mechanisms\ComponentRegistry;
+use Happytodev\BlogrComments\Filament\Resources\CommentResource\Pages\ListComments;
+use Happytodev\BlogrComments\Filament\Resources\CommentResource\Pages\ViewComment;
 
 class BlogrCommentsServiceProvider extends ServiceProvider
 {
@@ -63,6 +65,7 @@ class BlogrCommentsServiceProvider extends ServiceProvider
 
         $this->registerBladeStacks();
         $this->registerBlogCardCommentCounts();
+        $this->registerLivewireComponents();
         $this->registerFilamentPages();
         $this->registerMiddleware();
         $this->registerCommands();
@@ -158,6 +161,20 @@ class BlogrCommentsServiceProvider extends ServiceProvider
         }
     }
 
+    protected function registerLivewireComponents(): void
+    {
+        $components = [
+            CommentSettings::class,
+            ListComments::class,
+            ViewComment::class,
+        ];
+
+        foreach ($components as $component) {
+            $name = app(ComponentRegistry::class)->getName($component);
+            Livewire::component($name, $component);
+        }
+    }
+
     protected function registerFilamentPages(): void
     {
         if (! $this->isExtensionEnabled()) {
@@ -179,11 +196,6 @@ class BlogrCommentsServiceProvider extends ServiceProvider
         }
 
         $panel->pages([CommentSettings::class]);
-
-        Livewire::component(
-            app(ComponentRegistry::class)->getName(CommentSettings::class),
-            CommentSettings::class,
-        );
 
         $slug = CommentSettings::getSlug($panel);
         $path = trim($panel->getPath(), '/') . '/' . ltrim($slug, '/');

@@ -2,6 +2,16 @@
 
 All notable changes to `blogr-comments` will be documented in this file.
 
+## v1.1.3 - 2026-07-05
+
+### 🐛 Bug Fixes
+
+- **Livewire 419**: Register all Filament page components (`CommentSettings`, `ListComments`, `ViewComment`) as Livewire component aliases in `registerLivewireComponents()`. The Filament panel's `SetUpPanel` middleware does not run on `/livewire/update`, leaving the `ComponentRegistry` empty. Livewire's release token verification then calls `nameToClass()` → `generateClassFromName()` → wrong class → `ComponentNotFoundException` → `LivewireReleaseTokenMismatchException` → 419.
+
+### 🧪 Tests
+
+- **regression test**: Add `all page components are resolvable from Livewire ComponentRegistry` test with production config (`livewire.class_namespace = App\Livewire`).
+
 ## v1.1.2 - 2026-06-29
 
 ### 🐛 Bug Fixes

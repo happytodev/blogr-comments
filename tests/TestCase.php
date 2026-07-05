@@ -11,6 +11,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app): array
     {
         return [
+            \Livewire\LivewireServiceProvider::class,
             \Happytodev\BlogrComments\BlogrCommentsServiceProvider::class,
         ];
     }
@@ -24,5 +25,7 @@ class TestCase extends Orchestra
             'database' => ':memory:',
             'prefix' => '',
         ]);
+
+        $app['config']->set('livewire.class_namespace', 'App\\Livewire');
     }
 }
