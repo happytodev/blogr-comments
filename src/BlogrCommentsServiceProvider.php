@@ -14,8 +14,8 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View;
+use Illuminate\Support\Str;
 use Livewire\Livewire;
-use Livewire\Mechanisms\ComponentRegistry;
 use Happytodev\BlogrComments\Filament\Resources\CommentResource\Pages\ListComments;
 use Happytodev\BlogrComments\Filament\Resources\CommentResource\Pages\ViewComment;
 
@@ -170,7 +170,7 @@ class BlogrCommentsServiceProvider extends ServiceProvider
         ];
 
         foreach ($components as $component) {
-            $name = app(ComponentRegistry::class)->getName($component);
+            $name = Str::kebab(class_basename($component));
             Livewire::component($name, $component);
         }
     }

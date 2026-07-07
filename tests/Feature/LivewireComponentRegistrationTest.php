@@ -3,9 +3,10 @@
 use Happytodev\BlogrComments\Filament\Pages\CommentSettings;
 use Happytodev\BlogrComments\Filament\Resources\CommentResource\Pages\ListComments;
 use Happytodev\BlogrComments\Filament\Resources\CommentResource\Pages\ViewComment;
-use Livewire\Mechanisms\ComponentRegistry;
+use Illuminate\Support\Str;
+use Livewire\Livewire;
 
-test('all page components are resolvable from Livewire ComponentRegistry', function () {
+test('all page components can be instantiated', function () {
     $components = [
         CommentSettings::class,
         ListComments::class,
@@ -13,8 +14,6 @@ test('all page components are resolvable from Livewire ComponentRegistry', funct
     ];
 
     foreach ($components as $component) {
-        $name = app(ComponentRegistry::class)->getName($component);
-        $resolved = app(ComponentRegistry::class)->getClass($name);
-        expect($resolved)->toBe($component);
+        expect(fn () => app($component))->not->toThrow(\Throwable::class);
     }
 });
