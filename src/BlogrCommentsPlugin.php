@@ -30,7 +30,7 @@ class BlogrCommentsPlugin implements BlogrExtension, FilamentPlugin
 
     public function getVersion(): string
     {
-        return '1.1.3';
+        return '2.1.0';
     }
 
     public function getAuthor(): string
