@@ -2,6 +2,21 @@
 
 All notable changes to `blogr-comments` will be documented in this file.
 
+## v2.1.0 - 2026-10-15
+
+### 🐛 Bug Fixes
+
+- **Settings are stored in the database instead of the config file** (#3). Saving the comments
+  settings screen rewrote `config/blogr-comments.php`: the settings looked saved, and the next
+  deployment — which rebuilds the release from the repository — silently put the file back. The
+  values now go into the `blogr_comments_settings` table and are applied on top of the file at boot;
+  the committed `config/blogr-comments.php` keeps its role of defaults and its comments. `null`
+  values are never stored, and the previous behaviour is kept while the table has not been migrated.
+
+### ⬆️ Upgrading
+
+- Run `php artisan migrate` to create the settings table.
+
 ## v1.1.3 - 2026-07-05
 
 ### 🐛 Bug Fixes
