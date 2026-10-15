@@ -10,6 +10,8 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Happytodev\Blogr\Services\ExtensionRegistry;
+use Happytodev\BlogrComments\Services\SettingsRepository;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Artisan;
 use Filament\Schemas\Schema;
 
@@ -257,13 +259,10 @@ class CommentSettings extends Page
             ],
         ];
 
-        $configPath = config_path('blogr-comments.php');
-        $currentConfig = config('blogr-comments', []);
-        $updatedConfig = array_merge($currentConfig, $data);
-
-        $export = var_export($updatedConfig, true);
-
-        file_put_contents($configPath, "<?php\n\nreturn {$export};\n");
+        // Les réglages vont en base : ils survivent aux déploiements, aux retours
+        // en arrière et à un config:clear. Le fichier de configuration ne sert plus
+        // que de repli, tant que la table n'a pas été migrée.
+        $this->persistSettings($data);
 
         Artisan::call('config:clear');
 
@@ -271,5 +270,60 @@ class CommentSettings extends Page
             ->title('Comment settings saved!')
             ->success()
             ->send();
+    }
+
+    /**
+     * Persist what the form holds.
+     *
+     * Preferred path: one row per setting in `blogr_comments_settings`, applied on
+     * top of the configuration file at boot — an admin save then survives
+     * deployments, rollbacks and `config:clear`, and the committed file keeps its
+     * comments and its role of defaults.
+     *
+     * Fallback, while the table has not been migrated: the historical behaviour.
+     *
+     * @param  array<string, mixed>  $data
+     * @return int|null the number of stored settings, null when the file was used
+     */
+    protected function persistSettings(array $data): ?int
+    {
+        $settings = app(SettingsRepository::class);
+
+        if (! $settings->hasTable()) {
+            $this->updateConfigFile($data);
+
+            return null;
+        }
+
+        // Un null veut dire « non renseigné » : le stocker rendrait la valeur du
+        // fichier inatteignable, et un formulaire partiellement rempli viderait
+        // des réglages.
+        $values = array_filter(Arr::dot($data), fn ($value) => $value !== null);
+        $settings->put($values);
+
+        // La page se rend depuis la configuration vivante : on applique tout de suite.
+        foreach ($values as $key => $value) {
+            config()->set("blogr-comments.{$key}", $value);
+        }
+
+        return $settings->count();
+    }
+
+    private function updateConfigFile(array $data): void
+    {
+        if (app()->environment('testing')) {
+            foreach (Arr::dot($data) as $key => $value) {
+                config()->set("blogr-comments.{$key}", $value);
+            }
+
+            return;
+        }
+
+        $configPath = config_path('blogr-comments.php');
+        $currentConfig = config('blogr-comments', []);
+        $updatedConfig = array_merge($currentConfig, $data);
+        $export = var_export($updatedConfig, true);
+
+        file_put_contents($configPath, "<?php\n\nreturn {$export};\n");
     }
 }

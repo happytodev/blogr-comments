@@ -9,6 +9,7 @@ use Happytodev\BlogrComments\Console\Commands\SendCommentDigest;
 use Happytodev\BlogrComments\Filament\Pages\CommentSettings;
 use Happytodev\BlogrComments\Http\Middleware\ThrottleComments;
 use Happytodev\BlogrComments\Models\Comment;
+use Happytodev\BlogrComments\Services\SettingsRepository;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,9 @@ class BlogrCommentsServiceProvider extends ServiceProvider
 
         $this->app->singleton(BlogrCommentsPlugin::class, fn () => new BlogrCommentsPlugin);
 
+        // Réglages enregistrés depuis l'admin (appliqués au démarrage, plus bas)
+        $this->app->singleton(SettingsRepository::class);
+
         $this->callAfterResolving(PanelRegistry::class, function (PanelRegistry $registry) {
             $panel = $registry->get('admin');
 
@@ -40,6 +44,10 @@ class BlogrCommentsServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Les réglages de l'admin (table blogr_comments_settings) passent avant
+        // tout ce qui lit la configuration : compositeurs de vues, extensions, pages.
+        $this->app->make(SettingsRepository::class)->applyToConfig();
+
         $this->registerExtensions();
 
         if (! $this->isExtensionEnabled()) {
