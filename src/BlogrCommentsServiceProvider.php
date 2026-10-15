@@ -28,7 +28,7 @@ class BlogrCommentsServiceProvider extends ServiceProvider
 
         $this->app->singleton(BlogrCommentsPlugin::class, fn () => new BlogrCommentsPlugin);
 
-        // Réglages enregistrés depuis l'admin (appliqués au démarrage, plus bas)
+        // Settings saved from the admin (applied at boot, further down)
         $this->app->singleton(SettingsRepository::class);
 
         $this->callAfterResolving(PanelRegistry::class, function (PanelRegistry $registry) {
@@ -44,8 +44,8 @@ class BlogrCommentsServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Les réglages de l'admin (table blogr_comments_settings) passent avant
-        // tout ce qui lit la configuration : compositeurs de vues, extensions, pages.
+        // The admin settings (blogr_comments_settings table) come before everything
+        // that reads the configuration: view composers, extensions, pages.
         $this->app->make(SettingsRepository::class)->applyToConfig();
 
         $this->registerExtensions();

@@ -5,8 +5,8 @@ use Happytodev\BlogrComments\Services\SettingsRepository;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Issue #3 — les réglages de l'admin doivent vivre en base, pas dans le fichier
- * de configuration (remplacé à chaque déploiement par la copie du dépôt).
+ * Issue #3 — the admin settings must live in the database, not in the config
+ * file (replaced at every deployment by the repository's copy).
  */
 beforeEach(function () {
     $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
@@ -24,17 +24,17 @@ it('regression_3_stores_an_admin_save_in_the_database_instead_of_the_config_file
     $page->allow_self_vote = false;
     $page->save();
 
-    // Une ligne par réglage, sous son chemin de configuration pointé.
+    // One row per setting, under its dotted configuration path.
     expect(DB::table(SettingsRepository::TABLE)->where('key', 'moderation.mode')->value('value'))
         ->toBe('"pre"')
         ->and(DB::table(SettingsRepository::TABLE)->where('key', 'voting.allow_self_vote')->value('value'))
         ->toBe('false');
 
-    // Et les valeurs s'appliquent tout de suite, donc la page reflète l'enregistrement.
+    // And the values apply at once, so the page reflects the save.
     expect(config('blogr-comments.moderation.mode'))->toBe('pre')
         ->and(config('blogr-comments.voting.allow_self_vote'))->toBeFalse();
 
-    // Le fichier de configuration n'est plus réécrit.
+    // The configuration file is no longer rewritten.
     expect(file_exists($configFile) ? md5_file($configFile) : null)->toBe($before);
 });
 
@@ -58,13 +58,13 @@ it('regression_3_applies_the_stored_settings_on_top_of_the_configuration', funct
 });
 
 it('regression_3_never_stores_a_null_value', function () {
-    // Une page enregistrée sans être montée porte des valeurs par défaut.
+    // A page saved without being mounted carries default values.
     (new CommentSettings)->save();
 
     expect(DB::table(SettingsRepository::TABLE)->pluck('value'))->not->toContain('null');
 
-    // Un null passé au dépôt veut dire « non renseigné » : il est ignoré, aucune
-    // ligne n'est créée pour lui, et les autres valeurs passent.
+    // A null passed to the repository means "not filled in": it is ignored, no row
+    // is created for it, and the other values go through.
     app(SettingsRepository::class)->put([
         'notifications.owner_email' => null,
         'moderation.mode' => 'pre',
@@ -84,9 +84,9 @@ it('regression_3_does_not_bake_the_overrides_into_the_compiled_configuration', f
 
     config(['blogr-comments.threading.max_depth' => 3]);
 
-    // `php artisan config:cache` démarre l'application avant de figer la
-    // configuration : y appliquer les surcharges les graverait dans le fichier
-    // compilé, qui passerait alors devant la table.
+    // `php artisan config:cache` boots the application before freezing the
+    // configuration: applying the overrides there would bake them into the
+    // compiled file, which would then take precedence over the table.
     $_SERVER['argv'] = ['artisan', 'config:cache'];
 
     try {
@@ -124,8 +124,8 @@ it('regression_3_falls_back_to_the_config_file_while_the_table_is_missing', func
 
     $page->save();
 
-    // Tant que la table n'est pas migrée, le comportement d'avant est conservé
-    // (en environnement de test, le repli applique les valeurs en mémoire).
+    // Until the table is migrated, the previous behaviour is kept (in the test
+    // environment, the fallback applies the values in memory).
     expect(config('blogr-comments.moderation.mode'))->toBe('pre')
         ->and(DB::table(SettingsRepository::TABLE)->count())->toBe(0);
 });
